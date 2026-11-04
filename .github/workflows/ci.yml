@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.10'
+          - '1.11'
+          - 'release'
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        arch:
+          - x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - uses: julia-actions/cache@v2
+      - name: Run Test Suite
+        run: julia --color=yes test/runtests.jl
+      - name: Verify CLI Execution
+        run: |
+          julia --color=yes bin/pyronucleus --help
+          julia --color=yes bin/pyronucleus solar-core
+          julia --color=yes bin/pyronucleus cno-burn
+          julia --color=yes bin/pyronucleus triple-alpha
+          julia --color=yes bin/pyronucleus nse
+          julia --color=yes bin/pyronucleus benchmark

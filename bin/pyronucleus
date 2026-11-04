@@ -1,0 +1,8 @@
+#!/usr/bin/env julia
+
+using Pkg
+Pkg.activate(normpath(joinpath(@__DIR__, "..")))
+
+using Pyronucleus
+
+Pyronucleus.run_cli(ARGS)
